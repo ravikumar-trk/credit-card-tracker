@@ -64,12 +64,13 @@ const EditCardView = ({ cardData, onBackPress, onSaveCard }) => {
 
   return (
     <SafeAreaView style={commonStyles.containerNoPadding}>
-      <View style={commonStyles.detailsHeader}>
-        <Text style={commonStyles.title} numberOfLines={1}>
+      <View style={commonStyles.pageHeader}>
+        <View style={{ width: 24 }} />
+        <Text style={commonStyles.pageHeaderTitle} numberOfLines={1}>
           Edit Card
         </Text>
         <TouchableOpacity style={commonStyles.homeButton} onPress={onBackPress}>
-          <Text style={commonStyles.homeIcon}>🏠</Text>
+          <Text style={commonStyles.homeIcon}>✕</Text>
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={commonStyles.detailsContainer}>

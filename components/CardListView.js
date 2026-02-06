@@ -10,7 +10,7 @@ import StatusBadge from "./StatusBadge";
 import commonStyles from "../styles/commonStyles";
 
 const CardListView = ({
-  staticCards,
+  defaultCards,
   payments,
   getCurrentMonthKey,
   getCurrentMonthName,
@@ -18,20 +18,16 @@ const CardListView = ({
   onViewPress,
   onEditPress,
   onAddCardPress,
+  onHomePress,
 }) => {
-  //   console.log(staticCards);
+  //   console.log(defaultCards);
   return (
-    <SafeAreaView style={commonStyles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-          marginTop: 16,
-        }}
-      >
-        <Text style={commonStyles.header}>My Credit Cards</Text>
+    <SafeAreaView style={commonStyles.containerNoPadding}>
+      <View style={commonStyles.pageHeader}>
+        <TouchableOpacity onPress={onHomePress}>
+          <Text style={commonStyles.homeIcon}>🏠</Text>
+        </TouchableOpacity>
+        <Text style={commonStyles.pageHeaderTitle}>My Credit Cards</Text>
         <TouchableOpacity
           style={{
             backgroundColor: "#4CAF50",
@@ -47,7 +43,7 @@ const CardListView = ({
         </TouchableOpacity>
       </View>
       <FlatList
-        data={staticCards}
+        data={defaultCards}
         keyExtractor={(item) => item.id}
         scrollEnabled={true}
         nestedScrollEnabled={true}

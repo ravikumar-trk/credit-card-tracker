@@ -11,8 +11,9 @@ import commonStyles from "../styles/commonStyles";
 const CardInfoModal = ({ cardDetails, onBackPress }) => {
   return (
     <SafeAreaView style={commonStyles.containerNoPadding}>
-      <View style={commonStyles.detailsHeader}>
-        <Text style={commonStyles.title} numberOfLines={1}>
+      <View style={commonStyles.pageHeader}>
+        <View style={{ width: 24 }} />
+        <Text style={commonStyles.pageHeaderTitle} numberOfLines={1}>
           Card Details
         </Text>
         <TouchableOpacity style={commonStyles.homeButton} onPress={onBackPress}>

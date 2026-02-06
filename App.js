@@ -7,7 +7,10 @@ import MonthDetailsView from "./components/MonthDetailsView";
 import CardInfoModal from "./components/CardInfoModal";
 import AddCardView from "./components/AddCardView";
 import EditCardView from "./components/EditCardView";
-import defaultCards from "./components/staticCards";
+import HomeView from "./components/HomeView";
+import TransactionsListView from "./components/TransactionsListView";
+import TransactionFormView from "./components/TransactionFormView";
+import { defaultCards } from "./utils/constants";
 import {
   getCurrentMonthKey,
   getMonthName,
@@ -21,8 +24,18 @@ import {
   loadCards,
   saveCards,
 } from "./utils/storageUtils";
+import {
+  loadTransactions,
+  saveTransactions,
+  updateTransaction,
+  deleteTransaction,
+} from "./utils/transactionUtils";
 
 export default function App() {
+  // View state
+  const [currentView, setCurrentView] = useState("home"); // 'home', 'cards', 'transactions'
+
+  // Cards state
   const [selectedCard, setSelectedCard] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [viewCardDetails, setViewCardDetails] = useState(null);
@@ -32,6 +45,11 @@ export default function App() {
   const [paid, setPaid] = useState(false);
   const [payments, setPayments] = useState({});
   const [cards, setCards] = useState(defaultCards);
+
+  // Transactions state
+  const [transactions, setTransactions] = useState([]);
+  const [addingTransaction, setAddingTransaction] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
   useEffect(() => {
     initializeData();
@@ -45,6 +63,9 @@ export default function App() {
     if (cardsData.length > 0) {
       setCards(cardsData);
     }
+
+    const transactionsData = await loadTransactions();
+    setTransactions(transactionsData);
   };
 
   const handleSavePayments = async (newPayments) => {
@@ -64,6 +85,54 @@ export default function App() {
     );
     await saveCards(updatedCards);
     setCards(updatedCards);
+  };
+
+  const handleSaveTransaction = async (transactionData) => {
+    if (editingTransaction) {
+      // Update existing transaction
+      const updated = await updateTransaction(
+        editingTransaction.id,
+        transactionData
+      );
+      if (updated) {
+        const updatedTransactions = transactions.map((t) =>
+          t.id === editingTransaction.id ? updated : t
+        );
+        setTransactions(updatedTransactions);
+        setEditingTransaction(null);
+        setAddingTransaction(false);
+        Alert.alert("Transaction updated successfully");
+      }
+    } else {
+      // Add new transaction
+      const newTransaction = {
+        ...transactionData,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+      };
+      const updatedTransactions = [...transactions, newTransaction];
+      await saveTransactions(updatedTransactions);
+      setTransactions(updatedTransactions);
+      setAddingTransaction(false);
+      Alert.alert("Transaction added successfully");
+    }
+  };
+
+  const handleDeleteTransaction = async (transactionId) => {
+    Alert.alert("Delete Transaction", "Are you sure?", [
+      { text: "Cancel" },
+      {
+        text: "Delete",
+        onPress: async () => {
+          await deleteTransaction(transactionId);
+          const updatedTransactions = transactions.filter(
+            (t) => t.id !== transactionId
+          );
+          setTransactions(updatedTransactions);
+          Alert.alert("Transaction deleted");
+        },
+      },
+    ]);
   };
 
   const openCard = (card) => {
@@ -101,6 +170,52 @@ export default function App() {
     Alert.alert("Payment saved successfully");
     setSelectedMonth(null);
   };
+
+  // Render Transaction Form View
+  if (addingTransaction) {
+    return (
+      <>
+        <StatusBar style="dark" />
+        <TransactionFormView
+          defaultCards={cards}
+          transaction={editingTransaction}
+          onSave={handleSaveTransaction}
+          onCancel={() => {
+            setAddingTransaction(false);
+            setEditingTransaction(null);
+          }}
+          onHomePress={() => {
+            setAddingTransaction(false);
+            setEditingTransaction(null);
+            setCurrentView("home");
+          }}
+        />
+      </>
+    );
+  }
+
+  // Render Transactions List View
+  if (currentView === "transactions") {
+    return (
+      <>
+        <StatusBar style="dark" />
+        <TransactionsListView
+          defaultCards={cards}
+          transactions={transactions}
+          onAddTransaction={() => {
+            setEditingTransaction(null);
+            setAddingTransaction(true);
+          }}
+          onEditTransaction={(transaction) => {
+            setEditingTransaction(transaction);
+            setAddingTransaction(true);
+          }}
+          onDeleteTransaction={handleDeleteTransaction}
+          onHomePress={() => setCurrentView("home")}
+        />
+      </>
+    );
+  }
 
   // Render Edit Card View
   if (editingCard) {
@@ -181,12 +296,25 @@ export default function App() {
     );
   }
 
+  // Render Home View
+  if (currentView === "home") {
+    return (
+      <>
+        <StatusBar style="dark" />
+        <HomeView
+          onCreditCardsPress={() => setCurrentView("cards")}
+          onTransactionsPress={() => setCurrentView("transactions")}
+        />
+      </>
+    );
+  }
+
   // Render Card List View
   return (
     <>
       <StatusBar style="dark" />
       <CardListView
-        staticCards={cards}
+        defaultCards={cards}
         payments={payments}
         getCurrentMonthKey={getCurrentMonthKey}
         getCurrentMonthName={getCurrentMonthName}
@@ -194,6 +322,7 @@ export default function App() {
         onViewPress={setViewCardDetails}
         onEditPress={setEditingCard}
         onAddCardPress={() => setAddingCard(true)}
+        onHomePress={() => setCurrentView("home")}
       />
     </>
   );

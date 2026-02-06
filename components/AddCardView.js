@@ -62,12 +62,13 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
 
   return (
     <SafeAreaView style={commonStyles.containerNoPadding}>
-      <View style={commonStyles.detailsHeader}>
-        <Text style={commonStyles.title} numberOfLines={1}>
+      <View style={commonStyles.pageHeader}>
+        <View style={{ width: 24 }} />
+        <Text style={commonStyles.pageHeaderTitle} numberOfLines={1}>
           Add New Card
         </Text>
         <TouchableOpacity style={commonStyles.homeButton} onPress={onBackPress}>
-          <Text style={commonStyles.homeIcon}>🏠</Text>
+          <Text style={commonStyles.homeIcon}>✕</Text>
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={commonStyles.detailsContainer}>
@@ -161,13 +162,28 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
           onChangeText={setLimit}
         />
 
-        <TouchableOpacity style={commonStyles.button} onPress={handleAddCard}>
+        <View style={commonStyles.buttonContainer}>
+          <TouchableOpacity
+            style={commonStyles.cancelBtn}
+            onPress={onBackPress}
+          >
+            <Text style={commonStyles.cancelBtnText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={commonStyles.saveBtn}
+            onPress={handleAddCard}
+          >
+            <Text style={commonStyles.saveBtnText}>Add Card</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* <TouchableOpacity style={commonStyles.button} onPress={handleAddCard}>
           <Text style={commonStyles.buttonText}>Add Card</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={onBackPress}>
           <Text style={commonStyles.back}>← Back</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ScrollView>
     </SafeAreaView>
   );
