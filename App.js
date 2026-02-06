@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Alert } from "react-native";
-
+import { StatusBar } from "expo-status-bar";
 import CardListView from "./components/CardListView";
 import CardDetailsView from "./components/CardDetailsView";
 import MonthDetailsView from "./components/MonthDetailsView";
@@ -105,78 +105,96 @@ export default function App() {
   // Render Edit Card View
   if (editingCard) {
     return (
-      <EditCardView
-        cardData={editingCard}
-        onBackPress={() => setEditingCard(null)}
-        onSaveCard={handleSaveEditedCard}
-      />
+      <>
+        <StatusBar style="dark" />
+        <EditCardView
+          cardData={editingCard}
+          onBackPress={() => setEditingCard(null)}
+          onSaveCard={handleSaveEditedCard}
+        />
+      </>
     );
   }
 
   // Render Add Card View
   if (addingCard) {
     return (
-      <AddCardView
-        onBackPress={() => setAddingCard(false)}
-        onAddCard={handleAddCard}
-      />
+      <>
+        <StatusBar style="dark" />
+        <AddCardView
+          onBackPress={() => setAddingCard(false)}
+          onAddCard={handleAddCard}
+        />
+      </>
     );
   }
 
   // Render Month Details View
   if (selectedMonth) {
     return (
-      <MonthDetailsView
-        selectedCard={selectedCard}
-        selectedMonth={selectedMonth}
-        amount={amount}
-        paid={paid}
-        getMonthName={getMonthName}
-        onAmountChange={setAmount}
-        onPaidToggle={() => setPaid(!paid)}
-        onSubmit={savePayment}
-        onBackPress={() => setSelectedMonth(null)}
-      />
+      <>
+        <StatusBar style="dark" />
+        <MonthDetailsView
+          selectedCard={selectedCard}
+          selectedMonth={selectedMonth}
+          amount={amount}
+          paid={paid}
+          getMonthName={getMonthName}
+          onAmountChange={setAmount}
+          onPaidToggle={() => setPaid(!paid)}
+          onSubmit={savePayment}
+          onBackPress={() => setSelectedMonth(null)}
+        />
+      </>
     );
   }
 
   // Render Card Details View
   if (selectedCard) {
     return (
-      <CardDetailsView
-        selectedCard={selectedCard}
-        payments={payments}
-        getAllMonths={getAllMonths}
-        getMonthName={getMonthName}
-        getCurrentMonthKey={getCurrentMonthKey}
-        isCurrentMonthOrPast={isCurrentMonthOrPast}
-        onBackPress={() => setSelectedCard(null)}
-        onMonthPress={openMonth}
-      />
+      <>
+        <StatusBar style="dark" />
+        <CardDetailsView
+          selectedCard={selectedCard}
+          payments={payments}
+          getAllMonths={getAllMonths}
+          getMonthName={getMonthName}
+          getCurrentMonthKey={getCurrentMonthKey}
+          isCurrentMonthOrPast={isCurrentMonthOrPast}
+          onBackPress={() => setSelectedCard(null)}
+          onMonthPress={openMonth}
+        />
+      </>
     );
   }
 
   // Render Card Info Modal
   if (viewCardDetails) {
     return (
-      <CardInfoModal
-        cardDetails={viewCardDetails}
-        onBackPress={() => setViewCardDetails(null)}
-      />
+      <>
+        <StatusBar style="dark" />
+        <CardInfoModal
+          cardDetails={viewCardDetails}
+          onBackPress={() => setViewCardDetails(null)}
+        />
+      </>
     );
   }
 
   // Render Card List View
   return (
-    <CardListView
-      staticCards={cards}
-      payments={payments}
-      getCurrentMonthKey={getCurrentMonthKey}
-      getCurrentMonthName={getCurrentMonthName}
-      onCardPress={openCard}
-      onViewPress={setViewCardDetails}
-      onEditPress={setEditingCard}
-      onAddCardPress={() => setAddingCard(true)}
-    />
+    <>
+      <StatusBar style="dark" />
+      <CardListView
+        staticCards={cards}
+        payments={payments}
+        getCurrentMonthKey={getCurrentMonthKey}
+        getCurrentMonthName={getCurrentMonthName}
+        onCardPress={openCard}
+        onViewPress={setViewCardDetails}
+        onEditPress={setEditingCard}
+        onAddCardPress={() => setAddingCard(true)}
+      />
+    </>
   );
 }
