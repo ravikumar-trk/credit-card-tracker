@@ -10,16 +10,18 @@ import {
 } from "react-native";
 import commonStyles from "../styles/commonStyles";
 
-const AddCardView = ({ onBackPress, onAddCard }) => {
-  const [name, setName] = useState("");
-  const [fullNumber, setFullNumber] = useState("");
-  const [type, setType] = useState("Visa");
-  const [cvv, setCvv] = useState("");
-  const [billCycle, setBillCycle] = useState("");
-  const [lastPaymentDate, setLastPaymentDate] = useState("");
-  const [limit, setLimit] = useState("");
+const EditCardView = ({ cardData, onBackPress, onSaveCard }) => {
+  const [name, setName] = useState(cardData.name);
+  const [fullNumber, setFullNumber] = useState(cardData.fullNumber);
+  const [type, setType] = useState(cardData.type);
+  const [cvv, setCvv] = useState(cardData.cvv);
+  const [billCycle, setBillCycle] = useState(cardData.billCycle);
+  const [lastPaymentDate, setLastPaymentDate] = useState(
+    cardData.lastPaymentDate
+  );
+  const [limit, setLimit] = useState(cardData.limit);
 
-  const handleAddCard = () => {
+  const handleSaveCard = () => {
     if (
       !name ||
       !fullNumber ||
@@ -32,7 +34,7 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
       return;
     }
 
-    if (fullNumber.replace(/\s/g, "").length !== 16) {
+    if (fullNumber.replaceAll(" ", "").length !== 16) {
       Alert.alert("Card number should be 16 digits");
       return;
     }
@@ -43,8 +45,8 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
     }
 
     const maskedNumber = "**** " + fullNumber.slice(-4);
-    const newCard = {
-      id: Date.now().toString(),
+    const updatedCard = {
+      ...cardData,
       name,
       number: maskedNumber,
       fullNumber,
@@ -55,8 +57,8 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
       limit,
     };
 
-    onAddCard(newCard);
-    Alert.alert("Card added successfully");
+    onSaveCard(updatedCard);
+    Alert.alert("Card updated successfully");
     onBackPress();
   };
 
@@ -64,7 +66,7 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
     <SafeAreaView style={commonStyles.containerNoPadding}>
       <View style={commonStyles.detailsHeader}>
         <Text style={commonStyles.title} numberOfLines={1}>
-          Add New Card
+          Edit Card
         </Text>
         <TouchableOpacity style={commonStyles.homeButton} onPress={onBackPress}>
           <Text style={commonStyles.homeIcon}>🏠</Text>
@@ -86,7 +88,7 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
           keyboardType="numeric"
           value={fullNumber}
           onChangeText={(text) => {
-            const cleaned = text.replace(/\s/g, "");
+            const cleaned = text.replaceAll(" ", "");
             if (cleaned.length <= 16) {
               const formatted = cleaned.match(/.{1,4}/g)?.join(" ") || cleaned;
               setFullNumber(formatted);
@@ -161,8 +163,8 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
           onChangeText={setLimit}
         />
 
-        <TouchableOpacity style={commonStyles.button} onPress={handleAddCard}>
-          <Text style={commonStyles.buttonText}>Add Card</Text>
+        <TouchableOpacity style={commonStyles.button} onPress={handleSaveCard}>
+          <Text style={commonStyles.buttonText}>Save Changes</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={onBackPress}>
@@ -173,4 +175,4 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
   );
 };
 
-export default AddCardView;
+export default EditCardView;

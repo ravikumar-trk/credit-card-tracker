@@ -6,6 +6,7 @@ import CardDetailsView from "./components/CardDetailsView";
 import MonthDetailsView from "./components/MonthDetailsView";
 import CardInfoModal from "./components/CardInfoModal";
 import AddCardView from "./components/AddCardView";
+import EditCardView from "./components/EditCardView";
 import defaultCards from "./components/staticCards";
 import {
   getCurrentMonthKey,
@@ -26,6 +27,7 @@ export default function App() {
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [viewCardDetails, setViewCardDetails] = useState(null);
   const [addingCard, setAddingCard] = useState(false);
+  const [editingCard, setEditingCard] = useState(null);
   const [amount, setAmount] = useState("");
   const [paid, setPaid] = useState(false);
   const [payments, setPayments] = useState({});
@@ -52,6 +54,14 @@ export default function App() {
 
   const handleAddCard = async (newCard) => {
     const updatedCards = [...cards, newCard];
+    await saveCards(updatedCards);
+    setCards(updatedCards);
+  };
+
+  const handleSaveEditedCard = async (updatedCard) => {
+    const updatedCards = cards.map((card) =>
+      card.id === updatedCard.id ? updatedCard : card
+    );
     await saveCards(updatedCards);
     setCards(updatedCards);
   };
@@ -91,6 +101,17 @@ export default function App() {
     Alert.alert("Payment saved successfully");
     setSelectedMonth(null);
   };
+
+  // Render Edit Card View
+  if (editingCard) {
+    return (
+      <EditCardView
+        cardData={editingCard}
+        onBackPress={() => setEditingCard(null)}
+        onSaveCard={handleSaveEditedCard}
+      />
+    );
+  }
 
   // Render Add Card View
   if (addingCard) {
@@ -154,6 +175,7 @@ export default function App() {
       getCurrentMonthName={getCurrentMonthName}
       onCardPress={openCard}
       onViewPress={setViewCardDetails}
+      onEditPress={setEditingCard}
       onAddCardPress={() => setAddingCard(true)}
     />
   );

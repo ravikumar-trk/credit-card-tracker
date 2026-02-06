@@ -172,7 +172,7 @@ const commonStyles = StyleSheet.create({
   // Labels and Text
   label: {
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 2,
   },
   sectionTitle: {
     fontSize: 18,
@@ -187,7 +187,8 @@ const commonStyles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 10,
     padding: 12,
-    marginTop: 16,
+    // marginTop: 16,
+    marginBottom: 16,
   },
   checkbox: {
     marginTop: 16,

@@ -16,9 +16,10 @@ const CardListView = ({
   getCurrentMonthName,
   onCardPress,
   onViewPress,
+  onEditPress,
   onAddCardPress,
 }) => {
-  console.log(staticCards);
+  //   console.log(staticCards);
   return (
     <SafeAreaView style={commonStyles.container}>
       <View
@@ -70,12 +71,20 @@ const CardListView = ({
                   }}
                 >
                   <Text style={commonStyles.cardTitle}>{item.name}</Text>
-                  <Text
-                    style={commonStyles.viewIcon}
-                    onPress={() => onViewPress(item)}
-                  >
-                    👁️
-                  </Text>
+                  <View style={{ flexDirection: "row", gap: 8 }}>
+                    <Text
+                      style={commonStyles.viewIcon}
+                      onPress={() => onViewPress(item)}
+                    >
+                      👁️
+                    </Text>
+                    <Text
+                      style={commonStyles.viewIcon}
+                      onPress={() => onEditPress(item)}
+                    >
+                      ✏️
+                    </Text>
+                  </View>
                 </View>
                 <Text>{item.number}</Text>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
