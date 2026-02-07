@@ -5,14 +5,28 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Image,
 } from "react-native";
 import commonStyles from "../styles/commonStyles";
+import { getCardBankImage } from "../utils/imageUtils";
 
 const CardInfoModal = ({ cardDetails, onBackPress }) => {
   return (
     <SafeAreaView style={commonStyles.containerNoPadding}>
       <View style={commonStyles.pageHeader}>
-        <View style={{ width: 24 }} />
+        {/* <View style={{ width: 24 }} /> */}
+        <View>
+          {cardDetails.bank && getCardBankImage(cardDetails?.bank) ? (
+            <Image
+              source={getCardBankImage(cardDetails?.bank)}
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: 4,
+              }}
+            />
+          ) : null}
+        </View>
         <Text style={commonStyles.pageHeaderTitle} numberOfLines={1}>
           Card Details
         </Text>
@@ -39,6 +53,13 @@ const CardInfoModal = ({ cardDetails, onBackPress }) => {
           <View style={commonStyles.detailRow}>
             <Text style={commonStyles.detailLabel}>CVV:</Text>
             <Text style={commonStyles.detailValue}>{cardDetails.cvv}</Text>
+          </View>
+
+          <View style={commonStyles.detailRow}>
+            <Text style={commonStyles.detailLabel}>Expiry Date:</Text>
+            <Text style={commonStyles.detailValue}>
+              {cardDetails.expiryDate}
+            </Text>
           </View>
 
           <View style={commonStyles.detailRow}>

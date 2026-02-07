@@ -1,13 +1,14 @@
-import React from "react";
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   SafeAreaView,
+  Image,
 } from "react-native";
 import StatusBadge from "./StatusBadge";
 import commonStyles from "../styles/commonStyles";
+import { getCardBankImage } from "../utils/imageUtils";
 
 const CardListView = ({
   defaultCards,
@@ -17,6 +18,7 @@ const CardListView = ({
   onCardPress,
   onViewPress,
   onEditPress,
+  onDeletePress,
   onAddCardPress,
   onHomePress,
 }) => {
@@ -42,63 +44,121 @@ const CardListView = ({
           </Text>
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={defaultCards}
-        keyExtractor={(item) => item.id}
-        scrollEnabled={true}
-        nestedScrollEnabled={true}
-        renderItem={({ item }) => {
-          const monthKey = getCurrentMonthKey();
-          const record = payments?.[item.id]?.[monthKey];
-          const isPaid = record?.paid ?? false;
+      {defaultCards.length === 0 ? (
+        <View style={commonStyles.emptyState}>
+          <Text style={commonStyles.emptyStateText}>No cards added yet</Text>
+          <TouchableOpacity onPress={onAddCardPress}>
+            <Text style={commonStyles.emptyStateBtn}>Add your first card</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={defaultCards}
+          keyExtractor={(item) => item.id}
+          scrollEnabled={true}
+          nestedScrollEnabled={true}
+          renderItem={({ item }) => {
+            const monthKey = getCurrentMonthKey();
+            const record = payments?.[item.id]?.[monthKey];
+            const isPaid = record?.paid ?? false;
 
-          return (
-            <View style={commonStyles.cardContainer}>
-              <TouchableOpacity
-                style={commonStyles.card}
-                onPress={() => onCardPress(item)}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
+            return (
+              <View style={commonStyles.cardContainer}>
+                <TouchableOpacity
+                  style={commonStyles.card}
+                  onPress={() => onCardPress(item)}
+                  activeOpacity={0.7}
                 >
-                  <Text style={commonStyles.cardTitle}>{item.name}</Text>
-                  <View style={{ flexDirection: "row", gap: 8 }}>
-                    <Text
-                      style={commonStyles.viewIcon}
-                      onPress={() => onViewPress(item)}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                    }}
+                  >
+                    <View
+                      style={{
+                        flex: 1,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 12,
+                      }}
                     >
-                      👁️
-                    </Text>
-                    <Text
-                      style={commonStyles.viewIcon}
-                      onPress={() => onEditPress(item)}
+                      <View>
+                        {item.bank && getCardBankImage(item.bank) ? (
+                          <Image
+                            source={getCardBankImage(item.bank)}
+                            style={{
+                              width: 60,
+                              height: 60,
+                              borderRadius: 4,
+                            }}
+                          />
+                        ) : null}
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text
+                          style={[
+                            commonStyles.cardTitle,
+                            { fontSize: 18, marginBottom: 4 },
+                          ]}
+                        >
+                          {item.name}
+                        </Text>
+                        <Text
+                          style={[
+                            commonStyles.cardNumber,
+                            { fontSize: 14, marginBottom: 6 },
+                          ]}
+                        >
+                          {item.fullNumber}
+                        </Text>
+                        {/* <Text>Expires: {item.expiryDate}</Text> */}
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <Text>Status ({getCurrentMonthName()}):</Text>
+                          <StatusBadge paid={isPaid} />
+                        </View>
+                        {/* {record?.amount && (
+                          <Text>Amount: ₹{record.amount}</Text>
+                        )} */}
+                      </View>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "column",
+                        gap: 12,
+                        justifyContent: "flex-end",
+                      }}
                     >
-                      ✏️
-                    </Text>
+                      <Text
+                        style={commonStyles.viewIcon}
+                        onPress={() => onViewPress(item)}
+                      >
+                        👁️
+                      </Text>
+                      <Text
+                        style={commonStyles.viewIcon}
+                        onPress={() => onEditPress(item)}
+                      >
+                        ✏️
+                      </Text>
+                      <Text
+                        style={commonStyles.viewIcon}
+                        onPress={() => onDeletePress(item)}
+                      >
+                        🗑️
+                      </Text>
+                    </View>
                   </View>
-                </View>
-                <Text>{item.number}</Text>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text>Status ({getCurrentMonthName()}):</Text>
-                  <StatusBadge paid={isPaid} />
-                </View>
-                {record?.amount && <Text>Amount: ₹{record.amount}</Text>}
-              </TouchableOpacity>
-              {/* <TouchableOpacity
-                style={commonStyles.viewButton}
-                onPress={() => onViewPress(item)}
-              >
-                
-              </TouchableOpacity> */}
-            </View>
-          );
-        }}
-      />
+                </TouchableOpacity>
+              </View>
+            );
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 };

@@ -11,6 +11,14 @@ const commonStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
+  containerWithScroll: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+    flexDirection: "column",
+  },
+  scrollableContent: {
+    flex: 1,
+  },
   detailsContainer: {
     padding: 16,
     paddingBottom: 40,
@@ -138,7 +146,7 @@ const commonStyles = StyleSheet.create({
     elevation: 3,
   },
   viewIcon: {
-    fontSize: 24,
+    fontSize: 18,
   },
 
   // History and Month Cards
@@ -168,13 +176,13 @@ const commonStyles = StyleSheet.create({
 
   // Status Badge
   statusBadge: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 6,
     paddingVertical: 6,
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
     marginLeft: 4,
-    minWidth: 80,
+    minWidth: 60,
   },
   statusPaid: {
     backgroundColor: "#4CAF50",
@@ -373,7 +381,7 @@ const commonStyles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     gap: 10,
-    marginTop: 20,
+    marginTop: 8,
   },
   cancelBtn: {
     flex: 1,

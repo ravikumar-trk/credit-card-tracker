@@ -33,7 +33,7 @@ const MonthDetailsView = ({
       </View>
       <ScrollView contentContainerStyle={commonStyles.detailsContainer}>
         <Text style={commonStyles.label}>
-          Card Number: {selectedCard.number}
+          Card Number: {selectedCard.fullNumber}
         </Text>
         <Text style={commonStyles.label}>
           Month: {getMonthName(selectedMonth)}

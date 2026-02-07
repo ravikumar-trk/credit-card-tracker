@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import commonStyles from "../styles/commonStyles";
 import { months } from "../utils/constants";
+import { getCardBankImage } from "../utils/imageUtils";
 import hsbc from "./../assets/cardImages/hsbc.png";
 
 const TransactionsListView = ({
@@ -22,36 +23,32 @@ const TransactionsListView = ({
 }) => {
   const [filterCardId, setFilterCardId] = useState("");
   const [filterMonth, setFilterMonth] = useState("");
+  const [filterUsedBy, setFilterUsedBy] = useState("");
   const [cardDropdownOpen, setCardDropdownOpen] = useState(false);
   const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
+  const [usedByDropdownOpen, setUsedByDropdownOpen] = useState(false);
 
   const filteredTransactions = useMemo(() => {
     return transactions
       .filter((t) => {
         const cardMatch = !filterCardId || t.cardId === filterCardId;
         const monthMatch = !filterMonth || t.month === filterMonth;
-        return cardMatch && monthMatch;
+        const usedByMatch =
+          !filterUsedBy ||
+          t.usedBy.toLowerCase() === filterUsedBy.toLowerCase();
+        return cardMatch && monthMatch && usedByMatch;
       })
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [transactions, filterCardId, filterMonth]);
+  }, [transactions, filterCardId, filterMonth, filterUsedBy]);
 
   const getCardName = (cardId) => {
     const card = defaultCards.find((c) => c.id === cardId);
     return card ? card.name : "Unknown";
   };
 
-  const getCardColor = (cardId) => {
+  const getCardBank = (cardId) => {
     const card = defaultCards.find((c) => c.id === cardId);
-    switch (card?.name) {
-      case "HDFC Credit Card":
-        return hsbc;
-      case "SBI Credit Card":
-        return hsbc;
-      case "ICICI Credit Card":
-        return hsbc;
-      default:
-        return null;
-    }
+    return card ? card.bank : "Unknown";
   };
 
   const getStatusColor = (status) => {
@@ -60,9 +57,9 @@ const TransactionsListView = ({
         return "#4CAF50";
       case "notPaid":
         return "#F44336";
-      case "splitwise":
+      case "addedSplitwise":
         return "#2196F3";
-      case "notSplitwise":
+      case "notAddSplitwise":
         return "#F44336";
       case "mine":
         return "#4CAF50";
@@ -77,8 +74,10 @@ const TransactionsListView = ({
         return "Paid";
       case "notPaid":
         return "Not Paid";
-      case "splitwise":
-        return "Splitwise";
+      case "addedSplitwise":
+        return "Added in Splitwise";
+      case "notAddSplitwise":
+        return "Not Added in Splitwise";
       case "mine":
         return "Mine";
       default:
@@ -86,7 +85,18 @@ const TransactionsListView = ({
     }
   };
 
+  const getUniqueUsedBy = () => {
+    const usedBySet = new Set(
+      transactions.map((t) => t.usedBy?.toLowerCase()).filter(Boolean),
+    );
+    return Array.from(usedBySet).map((value) => ({
+      value,
+      label: value.charAt(0).toUpperCase() + value.slice(1),
+    }));
+  };
+
   const renderTransactionItem = ({ item }) => {
+    console.log("Rendering transaction:", item);
     const months = [
       "Jan",
       "Feb",
@@ -107,12 +117,12 @@ const TransactionsListView = ({
       <View style={commonStyles.transactionCard}>
         <View style={commonStyles.transactionHeader}>
           <View style={commonStyles.cardInfo}>
-            {getCardColor(item.cardId) ? (
+            {item.cardId ? (
               <Image
-                source={getCardColor(item.cardId)}
+                source={getCardBankImage(getCardBank(item.cardId))}
                 style={{
                   width: 40,
-                  height: 25,
+                  height: 40,
                   borderRadius: 4,
                   marginRight: 10,
                 }}
@@ -176,7 +186,7 @@ const TransactionsListView = ({
   return (
     <>
       <StatusBar style="dark" />
-      <View style={commonStyles.containerNoPadding}>
+      <View style={commonStyles.containerWithScroll}>
         <View style={commonStyles.pageHeader}>
           <TouchableOpacity onPress={onHomePress}>
             <Text style={commonStyles.homeIcon}>🏠</Text>
@@ -223,13 +233,27 @@ const TransactionsListView = ({
                 <Text style={commonStyles.filterDropdownArrow}>▼</Text>
               </TouchableOpacity>
             </View>
+
+            <View style={commonStyles.filterColumn}>
+              <Text style={commonStyles.filterLabel}>Used By</Text>
+              <TouchableOpacity
+                style={commonStyles.filterDropdown}
+                onPress={() => setUsedByDropdownOpen(true)}
+              >
+                <Text style={commonStyles.filterDropdownText}>
+                  {filterUsedBy || "All"}
+                </Text>
+                <Text style={commonStyles.filterDropdownArrow}>▼</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          {(filterCardId || filterMonth) && (
+          {(filterCardId || filterMonth || filterUsedBy) && (
             <TouchableOpacity
               onPress={() => {
                 setFilterCardId("");
                 setFilterMonth("");
+                setFilterUsedBy("");
               }}
             >
               <Text style={commonStyles.clearBtn}>Clear Filters</Text>
@@ -237,98 +261,156 @@ const TransactionsListView = ({
           )}
         </View>
 
-        <Modal visible={cardDropdownOpen} transparent animationType="fade">
-          <TouchableOpacity
-            style={commonStyles.dropdownOverlay}
-            onPress={() => setCardDropdownOpen(false)}
-            activeOpacity={1}
-          >
-            <View style={commonStyles.dropdownMenu}>
-              <TouchableOpacity
-                style={commonStyles.dropdownItem}
-                onPress={() => {
-                  setFilterCardId("");
-                  setCardDropdownOpen(false);
-                }}
-              >
-                <Text style={commonStyles.dropdownItemText}>All Cards</Text>
-              </TouchableOpacity>
-              <FlatList
-                data={defaultCards}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={commonStyles.dropdownItem}
-                    onPress={() => {
-                      setFilterCardId(item.id);
-                      setCardDropdownOpen(false);
-                    }}
-                  >
-                    <Text style={commonStyles.dropdownItemText}>
-                      {item.name}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          </TouchableOpacity>
-        </Modal>
-
-        <Modal visible={monthDropdownOpen} transparent animationType="fade">
-          <TouchableOpacity
-            style={commonStyles.dropdownOverlay}
-            onPress={() => setMonthDropdownOpen(false)}
-            activeOpacity={1}
-          >
-            <View style={commonStyles.dropdownMenu}>
-              <TouchableOpacity
-                style={commonStyles.dropdownItem}
-                onPress={() => {
-                  setFilterMonth("");
-                  setMonthDropdownOpen(false);
-                }}
-              >
-                <Text style={commonStyles.dropdownItemText}>All Months</Text>
-              </TouchableOpacity>
-              <FlatList
-                data={months}
-                keyExtractor={(item) => item.value}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={commonStyles.dropdownItem}
-                    onPress={() => {
-                      setFilterMonth(item.value);
-                      setMonthDropdownOpen(false);
-                    }}
-                  >
-                    <Text style={commonStyles.dropdownItemText}>
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          </TouchableOpacity>
-        </Modal>
-
-        {filteredTransactions.length === 0 ? (
-          <View style={commonStyles.emptyState}>
-            <Text style={commonStyles.emptyStateText}>No transactions yet</Text>
-            <TouchableOpacity onPress={onAddTransaction}>
-              <Text style={commonStyles.emptyStateBtn}>
-                Add your first transaction
-              </Text>
+        <View style={commonStyles.scrollableContent}>
+          <Modal visible={cardDropdownOpen} transparent animationType="fade">
+            <TouchableOpacity
+              style={commonStyles.dropdownOverlay}
+              onPress={() => setCardDropdownOpen(false)}
+              activeOpacity={1}
+            >
+              <View style={commonStyles.dropdownMenu}>
+                <TouchableOpacity
+                  style={commonStyles.dropdownItem}
+                  onPress={() => {
+                    setFilterCardId("");
+                    setCardDropdownOpen(false);
+                  }}
+                >
+                  <Text style={commonStyles.dropdownItemText}>All Cards</Text>
+                </TouchableOpacity>
+                <FlatList
+                  data={defaultCards}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={{
+                        padding: 15,
+                        borderBottomWidth: 1,
+                        borderBottomColor: "#eee",
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                      onPress={() => {
+                        setFilterCardId(item.id);
+                        setCardDropdownOpen(false);
+                      }}
+                    >
+                      {item.bank && getCardBankImage(item.bank) ? (
+                        <Image
+                          source={getCardBankImage(item.bank)}
+                          style={{
+                            width: 40,
+                            height: 25,
+                            borderRadius: 4,
+                            marginRight: 12,
+                          }}
+                        />
+                      ) : null}
+                      <Text style={{ fontSize: 16, color: "#333" }}>
+                        {item.name}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
             </TouchableOpacity>
-          </View>
-        ) : (
-          <FlatList
-            data={filteredTransactions}
-            renderItem={renderTransactionItem}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            contentContainerStyle={commonStyles.listContent}
-          />
-        )}
+          </Modal>
+
+          <Modal visible={monthDropdownOpen} transparent animationType="fade">
+            <TouchableOpacity
+              style={commonStyles.dropdownOverlay}
+              onPress={() => setMonthDropdownOpen(false)}
+              activeOpacity={1}
+            >
+              <View style={commonStyles.dropdownMenu}>
+                <TouchableOpacity
+                  style={commonStyles.dropdownItem}
+                  onPress={() => {
+                    setFilterMonth("");
+                    setMonthDropdownOpen(false);
+                  }}
+                >
+                  <Text style={commonStyles.dropdownItemText}>All Months</Text>
+                </TouchableOpacity>
+                <FlatList
+                  data={months}
+                  keyExtractor={(item) => item.value}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={commonStyles.dropdownItem}
+                      onPress={() => {
+                        setFilterMonth(item.value);
+                        setMonthDropdownOpen(false);
+                      }}
+                    >
+                      <Text style={commonStyles.dropdownItemText}>
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+            </TouchableOpacity>
+          </Modal>
+
+          <Modal visible={usedByDropdownOpen} transparent animationType="fade">
+            <TouchableOpacity
+              style={commonStyles.dropdownOverlay}
+              onPress={() => setUsedByDropdownOpen(false)}
+              activeOpacity={1}
+            >
+              <View style={commonStyles.dropdownMenu}>
+                <TouchableOpacity
+                  style={commonStyles.dropdownItem}
+                  onPress={() => {
+                    setFilterUsedBy("");
+                    setUsedByDropdownOpen(false);
+                  }}
+                >
+                  <Text style={commonStyles.dropdownItemText}>All</Text>
+                </TouchableOpacity>
+                <FlatList
+                  data={getUniqueUsedBy()}
+                  keyExtractor={(item) => item.value}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={commonStyles.dropdownItem}
+                      onPress={() => {
+                        setFilterUsedBy(item.value);
+                        setUsedByDropdownOpen(false);
+                      }}
+                    >
+                      <Text style={commonStyles.dropdownItemText}>
+                        {item.label}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+            </TouchableOpacity>
+          </Modal>
+
+          {filteredTransactions.length === 0 ? (
+            <View style={commonStyles.emptyState}>
+              <Text style={commonStyles.emptyStateText}>
+                No transactions yet
+              </Text>
+              <TouchableOpacity onPress={onAddTransaction}>
+                <Text style={commonStyles.emptyStateBtn}>
+                  Add your first transaction
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredTransactions}
+              renderItem={renderTransactionItem}
+              keyExtractor={(item) => item.id}
+              scrollEnabled={true}
+              contentContainerStyle={commonStyles.listContent}
+            />
+          )}
+        </View>
       </View>
     </>
   );

@@ -81,10 +81,31 @@ export default function App() {
 
   const handleSaveEditedCard = async (updatedCard) => {
     const updatedCards = cards.map((card) =>
-      card.id === updatedCard.id ? updatedCard : card
+      card.id === updatedCard.id ? updatedCard : card,
     );
     await saveCards(updatedCards);
     setCards(updatedCards);
+  };
+
+  const handleDeleteCard = (cardToDelete) => {
+    Alert.alert(
+      "Delete Card",
+      `Are you sure you want to delete ${cardToDelete.name}?`,
+      [
+        { text: "Cancel" },
+        {
+          text: "Delete",
+          onPress: async () => {
+            const updatedCards = cards.filter(
+              (card) => card.id !== cardToDelete.id,
+            );
+            await saveCards(updatedCards);
+            setCards(updatedCards);
+            Alert.alert("Card deleted successfully");
+          },
+        },
+      ],
+    );
   };
 
   const handleSaveTransaction = async (transactionData) => {
@@ -92,11 +113,11 @@ export default function App() {
       // Update existing transaction
       const updated = await updateTransaction(
         editingTransaction.id,
-        transactionData
+        transactionData,
       );
       if (updated) {
         const updatedTransactions = transactions.map((t) =>
-          t.id === editingTransaction.id ? updated : t
+          t.id === editingTransaction.id ? updated : t,
         );
         setTransactions(updatedTransactions);
         setEditingTransaction(null);
@@ -126,7 +147,7 @@ export default function App() {
         onPress: async () => {
           await deleteTransaction(transactionId);
           const updatedTransactions = transactions.filter(
-            (t) => t.id !== transactionId
+            (t) => t.id !== transactionId,
           );
           setTransactions(updatedTransactions);
           Alert.alert("Transaction deleted");
@@ -321,6 +342,7 @@ export default function App() {
         onCardPress={openCard}
         onViewPress={setViewCardDetails}
         onEditPress={setEditingCard}
+        onDeletePress={handleDeleteCard}
         onAddCardPress={() => setAddingCard(true)}
         onHomePress={() => setCurrentView("home")}
       />

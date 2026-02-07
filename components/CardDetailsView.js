@@ -1,13 +1,14 @@
-import React from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  Image,
 } from "react-native";
 import StatusBadge from "./StatusBadge";
 import commonStyles from "../styles/commonStyles";
+import { getCardBankImage } from "../utils/imageUtils";
 
 const CardDetailsView = ({
   selectedCard,
@@ -76,7 +77,19 @@ const CardDetailsView = ({
   return (
     <SafeAreaView style={commonStyles.containerNoPadding}>
       <View style={commonStyles.pageHeader}>
-        <View style={{ width: 24 }} />
+        {/* <View style={{ width: 24 }} /> */}
+        <View>
+          {selectedCard.bank && getCardBankImage(selectedCard?.bank) ? (
+            <Image
+              source={getCardBankImage(selectedCard?.bank)}
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: 4,
+              }}
+            />
+          ) : null}
+        </View>
         <Text style={commonStyles.pageHeaderTitle} numberOfLines={1}>
           {selectedCard.name}
         </Text>
@@ -86,8 +99,11 @@ const CardDetailsView = ({
       </View>
       <ScrollView contentContainerStyle={commonStyles.detailsContainer}>
         <Text style={commonStyles.label}>
-          Card Number: {selectedCard.number}
+          Card Number: {selectedCard.fullNumber}
         </Text>
+        {/* <Text style={commonStyles.label}>
+          Expiry: {selectedCard.expiryDate}
+        </Text> */}
         <Text style={commonStyles.label}>Limit: {selectedCard.limit}</Text>
 
         <Text style={commonStyles.sectionTitle}>All Months</Text>

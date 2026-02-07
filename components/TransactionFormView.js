@@ -7,9 +7,11 @@ import {
   ScrollView,
   Modal,
   FlatList,
+  Image,
 } from "react-native";
 import commonStyles from "../styles/commonStyles";
 import { months, statusOptions } from "../utils/constants";
+import { getCardBankImage } from "../utils/imageUtils";
 
 const TransactionFormView = ({
   defaultCards,
@@ -19,14 +21,14 @@ const TransactionFormView = ({
   onHomePress,
 }) => {
   const [cardId, setCardId] = useState(
-    transaction?.cardId || defaultCards[0]?.id || ""
+    transaction?.cardId || defaultCards[0]?.id || "",
   );
   const [date, setDate] = useState(transaction?.date || "1");
   const [month, setMonth] = useState(transaction?.month || "1");
   const [amount, setAmount] = useState(transaction?.amount.toString() || "");
   const [usedBy, setUsedBy] = useState(transaction?.usedBy || "");
   const [description, setDescription] = useState(
-    transaction?.description || ""
+    transaction?.description || "",
   );
   const [status, setStatus] = useState(transaction?.status || "notPaid");
 
@@ -86,6 +88,11 @@ const TransactionFormView = ({
     }
   };
 
+  const getCardBank = (cardId) => {
+    const card = defaultCards.find((c) => c.id === cardId);
+    return card ? card.bank : "Unknown";
+  };
+
   const getCardName = (id) => {
     return defaultCards.find((c) => c.id === id)?.name || "Select Card";
   };
@@ -142,6 +149,51 @@ const TransactionFormView = ({
     </Modal>
   );
 
+  const CardDropdownModal = ({ visible, onSelect, onClose }) => (
+    <Modal visible={visible} transparent animationType="fade">
+      <TouchableOpacity
+        style={commonStyles.dropdownOverlay}
+        onPress={onClose}
+        activeOpacity={1}
+      >
+        <View style={commonStyles.dropdownMenu}>
+          <FlatList
+            data={defaultCards}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={{
+                  padding: 15,
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#eee",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+                onPress={() => {
+                  onSelect(item.id);
+                  onClose();
+                }}
+              >
+                {item.bank && getCardBankImage(item.bank) ? (
+                  <Image
+                    source={getCardBankImage(item.bank)}
+                    style={{
+                      width: 40,
+                      height: 25,
+                      borderRadius: 4,
+                      marginRight: 12,
+                    }}
+                  />
+                ) : null}
+                <Text style={{ fontSize: 16, color: "#333" }}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
+
   return (
     <ScrollView
       style={commonStyles.containerNoPadding}
@@ -149,6 +201,19 @@ const TransactionFormView = ({
     >
       <View style={commonStyles.pageHeader}>
         <View style={{ width: 24 }} />
+        <View>
+          {cardId ? (
+            <Image
+              source={getCardBankImage(getCardBank(cardId))}
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: 4,
+                marginRight: 10,
+              }}
+            />
+          ) : null}
+        </View>
         <Text style={commonStyles.pageHeaderTitle}>
           {transaction ? "Edit Transaction" : "Add Transaction"}
         </Text>
@@ -164,9 +229,8 @@ const TransactionFormView = ({
           onPress={() => setCardDropdownOpen(true)}
           error={errors.cardId}
         />
-        <DropdownModal
+        <CardDropdownModal
           visible={cardDropdownOpen}
-          options={defaultCards.map((c) => ({ value: c.id, label: c.name }))}
           onSelect={setCardId}
           onClose={() => setCardDropdownOpen(false)}
         />
@@ -197,7 +261,7 @@ const TransactionFormView = ({
           onClose={() => setMonthDropdownOpen(false)}
         />
 
-        <View style={commonStyles.fieldContainer}>
+        <View style={{ marginRight: 8 }}>
           <Text style={commonStyles.label}>Amount (₹)</Text>
           <TextInput
             style={[
@@ -215,7 +279,7 @@ const TransactionFormView = ({
           )}
         </View>
 
-        <View style={commonStyles.fieldContainer}>
+        <View style={{ marginRight: 8 }}>
           <Text style={commonStyles.label}>Used By</Text>
           <TextInput
             style={[
@@ -232,7 +296,7 @@ const TransactionFormView = ({
           )}
         </View>
 
-        <View style={commonStyles.fieldContainer}>
+        <View style={{ marginBottom: 0 }}>
           <Text style={commonStyles.label}>Description (Optional)</Text>
           <TextInput
             style={[commonStyles.input, commonStyles.textArea]}
