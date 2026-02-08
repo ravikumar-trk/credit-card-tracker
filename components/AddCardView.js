@@ -12,7 +12,7 @@ import {
   Modal,
 } from "react-native";
 import commonStyles from "../styles/commonStyles";
-import { cardBanks } from "../utils/constants";
+import { cardBanks, cardTypes } from "../utils/constants";
 import { getCardBankImage } from "../utils/imageUtils";
 
 const AddCardView = ({ onBackPress, onAddCard }) => {
@@ -99,7 +99,7 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
         <Text style={commonStyles.label}>Card Number (16 digits)</Text>
         <TextInput
           style={commonStyles.input}
-          placeholder="1234 5678 9012 3456"
+          placeholder="e.g., 1234 5678 9012 3456"
           keyboardType="numeric"
           value={fullNumber}
           onChangeText={(text) => {
@@ -116,12 +116,12 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
         <View
           style={{
             flexDirection: "row",
-            gap: 10,
+            gap: 6,
             marginTop: 0,
             marginBottom: 16,
           }}
         >
-          {["Visa", "Mastercard", "AmEx"].map((cardType) => (
+          {cardTypes.map((cardType) => (
             <TouchableOpacity
               key={cardType}
               style={[
@@ -235,7 +235,7 @@ const AddCardView = ({ onBackPress, onAddCard }) => {
             <Text style={commonStyles.label}>CVV</Text>
             <TextInput
               style={commonStyles.input}
-              placeholder="123"
+              placeholder="e.g., 123"
               keyboardType="numeric"
               value={cvv}
               onChangeText={(text) => {

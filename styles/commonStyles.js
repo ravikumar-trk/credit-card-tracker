@@ -96,7 +96,7 @@ const commonStyles = StyleSheet.create({
     fontWeight: "600",
   },
   typeButton: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 6,
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 2,

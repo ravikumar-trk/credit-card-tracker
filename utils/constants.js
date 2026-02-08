@@ -58,4 +58,6 @@ const cardBanks = [
   },
 ];
 
-export { defaultCards, months, statusOptions, cardBanks };
+const cardTypes = ["Visa", "Master", "RuPay", "Discover"];
+
+export { defaultCards, months, statusOptions, cardBanks, cardTypes };
