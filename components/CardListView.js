@@ -22,7 +22,6 @@ const CardListView = ({
   onAddCardPress,
   onHomePress,
 }) => {
-  //   console.log(defaultCards);
   return (
     <SafeAreaView style={commonStyles.containerNoPadding}>
       <View style={commonStyles.pageHeader}>

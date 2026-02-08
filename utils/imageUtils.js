@@ -16,7 +16,6 @@ const cardImageMap = {
  * @returns {object|null} - The image source object or null if not found
  */
 const getCardBankImage = (bankName) => {
-  console.log("Getting image for bank:", bankName);
   return cardImageMap[bankName] || null;
 };
 

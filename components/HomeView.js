@@ -8,7 +8,11 @@ import {
 } from "react-native";
 import commonStyles from "../styles/commonStyles";
 
-const HomeView = ({ onCreditCardsPress, onTransactionsPress }) => {
+const HomeView = ({
+  onCreditCardsPress,
+  onTransactionsPress,
+  onImportExportPress,
+}) => {
   return (
     <SafeAreaView style={commonStyles.containerNoPadding}>
       <StatusBar barStyle="dark-content" backgroundColor="#f5f5f5" />
@@ -48,6 +52,20 @@ const HomeView = ({ onCreditCardsPress, onTransactionsPress }) => {
           <Text style={commonStyles.homeCardTitle}>Transactions</Text>
           <Text style={commonStyles.homeCardSubtitle}>
             View and manage all transactions
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            commonStyles.homeCard,
+            { backgroundColor: "#FF9800", marginTop: 20 },
+          ]}
+          onPress={onImportExportPress}
+        >
+          <Text style={commonStyles.homeCardIcon}>💾</Text>
+          <Text style={commonStyles.homeCardTitle}>Import/Export</Text>
+          <Text style={commonStyles.homeCardSubtitle}>
+            Backup and restore all your data
           </Text>
         </TouchableOpacity>
       </View>

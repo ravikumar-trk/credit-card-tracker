@@ -96,7 +96,6 @@ const TransactionsListView = ({
   };
 
   const renderTransactionItem = ({ item }) => {
-    console.log("Rendering transaction:", item);
     const months = [
       "Jan",
       "Feb",

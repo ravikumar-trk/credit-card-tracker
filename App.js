@@ -10,6 +10,7 @@ import EditCardView from "./components/EditCardView";
 import HomeView from "./components/HomeView";
 import TransactionsListView from "./components/TransactionsListView";
 import TransactionFormView from "./components/TransactionFormView";
+import ImportExportView from "./components/ImportExportView";
 import { defaultCards } from "./utils/constants";
 import {
   getCurrentMonthKey,
@@ -32,8 +33,8 @@ import {
 } from "./utils/transactionUtils";
 
 export default function App() {
-  // View state
-  const [currentView, setCurrentView] = useState("home"); // 'home', 'cards', 'transactions'
+  // Centralized view state
+  const [currentView, setCurrentView] = useState("home");
 
   // Cards state
   const [selectedCard, setSelectedCard] = useState(null);
@@ -60,9 +61,7 @@ export default function App() {
     setPayments(paymentsData);
 
     const cardsData = await loadCards();
-    if (cardsData.length > 0) {
-      setCards(cardsData);
-    }
+    if (cardsData.length > 0) setCards(cardsData);
 
     const transactionsData = await loadTransactions();
     setTransactions(transactionsData);
@@ -77,6 +76,8 @@ export default function App() {
     const updatedCards = [...cards, newCard];
     await saveCards(updatedCards);
     setCards(updatedCards);
+    setAddingCard(false);
+    setCurrentView("cards");
   };
 
   const handleSaveEditedCard = async (updatedCard) => {
@@ -85,6 +86,8 @@ export default function App() {
     );
     await saveCards(updatedCards);
     setCards(updatedCards);
+    setEditingCard(null);
+    setCurrentView("cards");
   };
 
   const handleDeleteCard = (cardToDelete) => {
@@ -110,7 +113,6 @@ export default function App() {
 
   const handleSaveTransaction = async (transactionData) => {
     if (editingTransaction) {
-      // Update existing transaction
       const updated = await updateTransaction(
         editingTransaction.id,
         transactionData,
@@ -122,10 +124,10 @@ export default function App() {
         setTransactions(updatedTransactions);
         setEditingTransaction(null);
         setAddingTransaction(false);
+        setCurrentView("transactions");
         Alert.alert("Transaction updated successfully");
       }
     } else {
-      // Add new transaction
       const newTransaction = {
         ...transactionData,
         id: Date.now().toString(),
@@ -135,6 +137,7 @@ export default function App() {
       await saveTransactions(updatedTransactions);
       setTransactions(updatedTransactions);
       setAddingTransaction(false);
+      setCurrentView("transactions");
       Alert.alert("Transaction added successfully");
     }
   };
@@ -159,11 +162,13 @@ export default function App() {
   const openCard = (card) => {
     setSelectedCard(card);
     setSelectedMonth(null);
+    setCurrentView("cardDetails");
   };
 
   const openMonth = (monthKey) => {
     setSelectedMonth(monthKey);
     const record = payments?.[selectedCard.id]?.[monthKey];
+
     if (record) {
       setAmount(record.amount);
       setPaid(record.paid);
@@ -171,6 +176,8 @@ export default function App() {
       setAmount("");
       setPaid(false);
     }
+
+    setCurrentView("monthDetails");
   };
 
   const savePayment = () => {
@@ -189,10 +196,11 @@ export default function App() {
 
     handleSavePayments(newPayments);
     Alert.alert("Payment saved successfully");
-    setSelectedMonth(null);
+    setCurrentView("cardDetails");
   };
 
-  // Render Transaction Form View
+  // ---------- VIEW RENDERING ----------
+
   if (addingTransaction) {
     return (
       <>
@@ -204,6 +212,7 @@ export default function App() {
           onCancel={() => {
             setAddingTransaction(false);
             setEditingTransaction(null);
+            setCurrentView("transactions");
           }}
           onHomePress={() => {
             setAddingTransaction(false);
@@ -215,7 +224,6 @@ export default function App() {
     );
   }
 
-  // Render Transactions List View
   if (currentView === "transactions") {
     return (
       <>
@@ -245,7 +253,10 @@ export default function App() {
         <StatusBar style="dark" />
         <EditCardView
           cardData={editingCard}
-          onBackPress={() => setEditingCard(null)}
+          onBackPress={() => {
+            setEditingCard(null);
+            setCurrentView("cards");
+          }}
           onSaveCard={handleSaveEditedCard}
         />
       </>
@@ -258,15 +269,17 @@ export default function App() {
       <>
         <StatusBar style="dark" />
         <AddCardView
-          onBackPress={() => setAddingCard(false)}
+          onBackPress={() => {
+            setAddingCard(false);
+            setCurrentView("cards");
+          }}
           onAddCard={handleAddCard}
         />
       </>
     );
   }
 
-  // Render Month Details View
-  if (selectedMonth) {
+  if (currentView === "monthDetails" && selectedMonth) {
     return (
       <>
         <StatusBar style="dark" />
@@ -279,14 +292,13 @@ export default function App() {
           onAmountChange={setAmount}
           onPaidToggle={() => setPaid(!paid)}
           onSubmit={savePayment}
-          onBackPress={() => setSelectedMonth(null)}
+          onBackPress={() => setCurrentView("cardDetails")}
         />
       </>
     );
   }
 
-  // Render Card Details View
-  if (selectedCard) {
+  if (currentView === "cardDetails" && selectedCard) {
     return (
       <>
         <StatusBar style="dark" />
@@ -297,7 +309,7 @@ export default function App() {
           getMonthName={getMonthName}
           getCurrentMonthKey={getCurrentMonthKey}
           isCurrentMonthOrPast={isCurrentMonthOrPast}
-          onBackPress={() => setSelectedCard(null)}
+          onBackPress={() => setCurrentView("cards")}
           onMonthPress={openMonth}
         />
       </>
@@ -317,7 +329,18 @@ export default function App() {
     );
   }
 
-  // Render Home View
+  if (currentView === "importExport") {
+    return (
+      <>
+        <StatusBar style="dark" />
+        <ImportExportView
+          onBackPress={() => setCurrentView("home")}
+          onDataImported={initializeData}
+        />
+      </>
+    );
+  }
+
   if (currentView === "home") {
     return (
       <>
@@ -325,12 +348,13 @@ export default function App() {
         <HomeView
           onCreditCardsPress={() => setCurrentView("cards")}
           onTransactionsPress={() => setCurrentView("transactions")}
+          onImportExportPress={() => setCurrentView("importExport")}
         />
       </>
     );
   }
 
-  // Render Card List View
+  // Default → Card List
   return (
     <>
       <StatusBar style="dark" />
