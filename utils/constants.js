@@ -1,41 +1,4 @@
-const defaultCards = [
-  {
-    id: "1",
-    name: "HDFC Indian Oil Credit Card",
-    fullNumber: "4532 1234 5678 9012",
-    type: "Visa",
-    cvv: "234",
-    expiryDate: "03/29",
-    billCycle: "5th - 4th",
-    lastPaymentDate: "25th",
-    limit: "₹1,00,000",
-    bank: "HDFC IOL",
-  },
-  {
-    id: "2",
-    name: "SBI Credit Card",
-    fullNumber: "5678 9012 3456 7890",
-    type: "Mastercard",
-    cvv: "567",
-    expiryDate: "08/27",
-    billCycle: "10th - 9th",
-    lastPaymentDate: "30th",
-    limit: "₹75,000",
-    bank: "SBI",
-  },
-  {
-    id: "3",
-    name: "Amazon Pay ICICI",
-    fullNumber: "9012 3456 7890 1234",
-    type: "Visa",
-    cvv: "890",
-    expiryDate: "06/28",
-    billCycle: "15th - 14th",
-    lastPaymentDate: "28th",
-    limit: "₹50,000",
-    bank: "Amazon Pay ICICI",
-  },
-];
+const defaultCards = [];
 
 const months = [
   { value: "1", label: "Jan" },
