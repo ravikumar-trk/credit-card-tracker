@@ -8,6 +8,8 @@ import {
   Modal,
   FlatList,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import commonStyles from "../styles/commonStyles";
 import { months, statusOptions } from "../utils/constants";
@@ -198,145 +200,160 @@ const TransactionFormView = ({
   );
 
   return (
-    <ScrollView
-      style={commonStyles.containerNoPadding}
-      showsVerticalScrollIndicator={false}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={commonStyles.pageHeader}>
-        <View style={{ width: 24 }} />
-        <View>
-          {cardId ? (
-            <Image
-              source={getCardBankImage(getCardBank(cardId))}
-              style={{
-                width: 50,
-                height: 50,
-                borderRadius: 4,
-                marginRight: 10,
-              }}
+      <View style={commonStyles.containerNoPadding}>
+        <View style={commonStyles.pageHeader}>
+          <View style={{ width: 24 }} />
+          <View>
+            {cardId ? (
+              <Image
+                source={getCardBankImage(getCardBank(cardId))}
+                style={{
+                  width: 50,
+                  height: 50,
+                  borderRadius: 4,
+                  marginRight: 10,
+                }}
+              />
+            ) : null}
+          </View>
+          <Text style={commonStyles.pageHeaderTitle}>
+            {transaction ? "Edit Transaction" : "Add Transaction"}
+          </Text>
+          <TouchableOpacity style={commonStyles.homeButton} onPress={onCancel}>
+            <Text style={commonStyles.homeIcon}>✕</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Scroll only for form container */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ paddingBottom: 40 }}
+        >
+          <View style={commonStyles.formContainer}>
+            <DropdownButton
+              label="Card"
+              value={getCardName(cardId)}
+              onPress={() => setCardDropdownOpen(true)}
+              error={errors.cardId}
             />
-          ) : null}
-        </View>
-        <Text style={commonStyles.pageHeaderTitle}>
-          {transaction ? "Edit Transaction" : "Add Transaction"}
-        </Text>
-        <TouchableOpacity style={commonStyles.homeButton} onPress={onCancel}>
-          <Text style={commonStyles.homeIcon}>✕</Text>
-        </TouchableOpacity>
+            <CardDropdownModal
+              visible={cardDropdownOpen}
+              onSelect={setCardId}
+              onClose={() => setCardDropdownOpen(false)}
+            />
+
+            <DropdownButton
+              label="Date"
+              value={date}
+              onPress={() => setDateDropdownOpen(true)}
+              error={errors.date}
+            />
+            <DropdownModal
+              visible={dateDropdownOpen}
+              options={dates}
+              onSelect={setDate}
+              onClose={() => setDateDropdownOpen(false)}
+            />
+
+            <DropdownButton
+              label="Month"
+              value={getMonthName(month)}
+              onPress={() => setMonthDropdownOpen(true)}
+              error={errors.month}
+            />
+            <DropdownModal
+              visible={monthDropdownOpen}
+              options={months}
+              onSelect={setMonth}
+              onClose={() => setMonthDropdownOpen(false)}
+            />
+
+            <View style={{ marginRight: 8 }}>
+              <Text style={commonStyles.label}>Amount (₹)</Text>
+              <TextInput
+                style={[
+                  commonStyles.input,
+                  errors.amount && commonStyles.errorInput,
+                ]}
+                placeholder="Enter amount"
+                value={amount}
+                onChangeText={setAmount}
+                keyboardType="decimal-pad"
+                placeholderTextColor="#999"
+              />
+              {errors.amount && (
+                <Text style={commonStyles.errorText}>{errors.amount}</Text>
+              )}
+            </View>
+
+            <View style={{ marginRight: 8 }}>
+              <Text style={commonStyles.label}>Used By</Text>
+              <TextInput
+                style={[
+                  commonStyles.input,
+                  errors.usedBy && commonStyles.errorInput,
+                ]}
+                placeholder="e.g., John, Sarah, Shared"
+                value={usedBy}
+                onChangeText={setUsedBy}
+                placeholderTextColor="#999"
+              />
+              {errors.usedBy && (
+                <Text style={commonStyles.errorText}>{errors.usedBy}</Text>
+              )}
+            </View>
+
+            <View style={{ marginBottom: 0 }}>
+              <Text style={commonStyles.label}>Description (Optional)</Text>
+              <TextInput
+                style={[commonStyles.input, commonStyles.textArea]}
+                placeholder="e.g., Groceries, Gas, Entertainment"
+                value={description}
+                onChangeText={setDescription}
+                multiline
+                numberOfLines={3}
+                placeholderTextColor="#999"
+              />
+            </View>
+
+            <DropdownButton
+              label="Status"
+              value={getStatusLabel(status)}
+              onPress={() => setStatusDropdownOpen(true)}
+              error={errors.status}
+            />
+            <DropdownModal
+              visible={statusDropdownOpen}
+              options={statusOptions}
+              onSelect={setStatus}
+              onClose={() => setStatusDropdownOpen(false)}
+            />
+
+            <View style={commonStyles.buttonContainer}>
+              <TouchableOpacity
+                style={commonStyles.cancelBtn}
+                onPress={onCancel}
+              >
+                <Text style={commonStyles.cancelBtnText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={commonStyles.saveBtn}
+                onPress={handleSave}
+              >
+                <Text style={commonStyles.saveBtnText}>
+                  {transaction ? "Update" : "Add"} Transaction
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
       </View>
-
-      <View style={commonStyles.formContainer}>
-        <DropdownButton
-          label="Card"
-          value={getCardName(cardId)}
-          onPress={() => setCardDropdownOpen(true)}
-          error={errors.cardId}
-        />
-        <CardDropdownModal
-          visible={cardDropdownOpen}
-          onSelect={setCardId}
-          onClose={() => setCardDropdownOpen(false)}
-        />
-
-        <DropdownButton
-          label="Date"
-          value={date}
-          onPress={() => setDateDropdownOpen(true)}
-          error={errors.date}
-        />
-        <DropdownModal
-          visible={dateDropdownOpen}
-          options={dates}
-          onSelect={setDate}
-          onClose={() => setDateDropdownOpen(false)}
-        />
-
-        <DropdownButton
-          label="Month"
-          value={getMonthName(month)}
-          onPress={() => setMonthDropdownOpen(true)}
-          error={errors.month}
-        />
-        <DropdownModal
-          visible={monthDropdownOpen}
-          options={months}
-          onSelect={setMonth}
-          onClose={() => setMonthDropdownOpen(false)}
-        />
-
-        <View style={{ marginRight: 8 }}>
-          <Text style={commonStyles.label}>Amount (₹)</Text>
-          <TextInput
-            style={[
-              commonStyles.input,
-              errors.amount && commonStyles.errorInput,
-            ]}
-            placeholder="Enter amount"
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="decimal-pad"
-            placeholderTextColor="#999"
-          />
-          {errors.amount && (
-            <Text style={commonStyles.errorText}>{errors.amount}</Text>
-          )}
-        </View>
-
-        <View style={{ marginRight: 8 }}>
-          <Text style={commonStyles.label}>Used By</Text>
-          <TextInput
-            style={[
-              commonStyles.input,
-              errors.usedBy && commonStyles.errorInput,
-            ]}
-            placeholder="e.g., John, Sarah, Shared"
-            value={usedBy}
-            onChangeText={setUsedBy}
-            placeholderTextColor="#999"
-          />
-          {errors.usedBy && (
-            <Text style={commonStyles.errorText}>{errors.usedBy}</Text>
-          )}
-        </View>
-
-        <View style={{ marginBottom: 0 }}>
-          <Text style={commonStyles.label}>Description (Optional)</Text>
-          <TextInput
-            style={[commonStyles.input, commonStyles.textArea]}
-            placeholder="e.g., Groceries, Gas, Entertainment"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={3}
-            placeholderTextColor="#999"
-          />
-        </View>
-
-        <DropdownButton
-          label="Status"
-          value={getStatusLabel(status)}
-          onPress={() => setStatusDropdownOpen(true)}
-          error={errors.status}
-        />
-        <DropdownModal
-          visible={statusDropdownOpen}
-          options={statusOptions}
-          onSelect={setStatus}
-          onClose={() => setStatusDropdownOpen(false)}
-        />
-
-        <View style={commonStyles.buttonContainer}>
-          <TouchableOpacity style={commonStyles.cancelBtn} onPress={onCancel}>
-            <Text style={commonStyles.cancelBtnText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={commonStyles.saveBtn} onPress={handleSave}>
-            <Text style={commonStyles.saveBtnText}>
-              {transaction ? "Update" : "Add"} Transaction
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
