@@ -11,7 +11,8 @@ import {
 import commonStyles from "../styles/commonStyles";
 import { months } from "../utils/constants";
 import { getCardBankImage } from "../utils/imageUtils";
-import hsbc from "./../assets/cardImages/hsbc.png";
+
+const getCurrentMonth = () => (new Date().getMonth() + 1).toString();
 
 const TransactionsListView = ({
   defaultCards,
@@ -22,7 +23,7 @@ const TransactionsListView = ({
   onHomePress,
 }) => {
   const [filterCardId, setFilterCardId] = useState("");
-  const [filterMonth, setFilterMonth] = useState("");
+  const [filterMonth, setFilterMonth] = useState(getCurrentMonth());
   const [filterUsedBy, setFilterUsedBy] = useState("");
   const [cardDropdownOpen, setCardDropdownOpen] = useState(false);
   const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
@@ -93,6 +94,13 @@ const TransactionsListView = ({
       value,
       label: value.charAt(0).toUpperCase() + value.slice(1),
     }));
+    // const usedBySet = new Set(
+    //   transactions.map((t) => t.usedBy).filter(Boolean),
+    // );
+    // return Array.from(usedBySet).map((value) => ({
+    //   value,
+    //   label: value,
+    // }));
   };
 
   const renderTransactionItem = ({ item }) => {
@@ -155,8 +163,8 @@ const TransactionsListView = ({
           </View>
         </View>
 
-        <View style={commonStyles.transactionDetails}>
-          <Text style={commonStyles.detailLabel}>By: {item.usedBy}</Text>
+        {/* <View style={commonStyles.transactionDetails}>
+          <Text style={commonStyles.detailLabel}>Used By: {item.usedBy}</Text>
           {item.description && (
             <Text style={commonStyles.detailLabel}>
               Desc: {item.description}
@@ -177,6 +185,36 @@ const TransactionsListView = ({
           >
             <Text style={commonStyles.deleteBtnText}>🗑️ Delete</Text>
           </TouchableOpacity>
+        </View> */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 8,
+          }}
+        >
+          {/* LEFT SIDE → Used By & Description */}
+          <View style={{ flex: 1 }}>
+            <Text style={commonStyles.detailLabel}>Used By: {item.usedBy}</Text>
+
+            {item.description ? (
+              <Text style={commonStyles.detailLabel}>
+                Desc: {item.description}
+              </Text>
+            ) : null}
+          </View>
+
+          {/* RIGHT SIDE → Edit & Delete Icons */}
+          <View style={{ flexDirection: "row", gap: 12 }}>
+            <TouchableOpacity onPress={() => onEditTransaction(item)}>
+              <Text style={{ fontSize: 18 }}>✏️</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => onDeleteTransaction(item.id)}>
+              <Text style={{ fontSize: 18 }}>🗑️</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );

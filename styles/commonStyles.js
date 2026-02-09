@@ -456,7 +456,7 @@ const commonStyles = StyleSheet.create({
   },
   filterDropdownText: {
     fontSize: 13,
-    color: "#333",
+    color: "#c02f2f",
     flex: 1,
   },
   filterDropdownArrow: {

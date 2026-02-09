@@ -13,6 +13,9 @@ import commonStyles from "../styles/commonStyles";
 import { months, statusOptions } from "../utils/constants";
 import { getCardBankImage } from "../utils/imageUtils";
 
+const getTodayDate = () => new Date().getDate().toString();
+const getCurrentMonth = () => (new Date().getMonth() + 1).toString();
+
 const TransactionFormView = ({
   defaultCards,
   transaction = null,
@@ -23,9 +26,9 @@ const TransactionFormView = ({
   const [cardId, setCardId] = useState(
     transaction?.cardId || defaultCards[0]?.id || "",
   );
-  const [date, setDate] = useState(transaction?.date || "1");
-  const [month, setMonth] = useState(transaction?.month || "1");
-  const [amount, setAmount] = useState(transaction?.amount.toString() || "");
+  const [date, setDate] = useState(transaction?.date || getTodayDate());
+  const [month, setMonth] = useState(transaction?.month || getCurrentMonth());
+  const [amount, setAmount] = useState(transaction?.amount?.toString() || "");
   const [usedBy, setUsedBy] = useState(transaction?.usedBy || "");
   const [description, setDescription] = useState(
     transaction?.description || "",
@@ -43,15 +46,15 @@ const TransactionFormView = ({
   useEffect(() => {
     if (!transaction) {
       setCardId(defaultCards[0]?.id || "");
-      setDate("1");
-      setMonth("1");
+      setDate(getTodayDate());
+      setMonth(getCurrentMonth());
       setAmount("");
       setUsedBy("");
       setDescription("");
       setStatus("notPaid");
       setErrors({});
     }
-  }, [transaction]);
+  }, [transaction, defaultCards]);
 
   const dates = Array.from({ length: 31 }, (_, i) => ({
     value: (i + 1).toString(),
