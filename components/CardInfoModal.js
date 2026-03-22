@@ -13,9 +13,16 @@ import commonStyles from "../styles/commonStyles";
 import { getCardBankImage } from "../utils/imageUtils";
 
 const CardInfoModal = ({ cardDetails, onBackPress }) => {
-  const copyToClipboard = async (value, label) => {
-    await Clipboard.setStringAsync(`${label}: ${value}`);
-    Alert.alert("Copied", `${label} copied to clipboard`);
+  const copyToClipboard = async (obj, label) => {
+    await Clipboard.setStringAsync(
+      `${obj.bank}\n\nNo.: ${obj.fullNumber}\nCVV: ${obj.cvv}\nExp: ${obj.expiryDate}`,
+    );
+    Alert.alert("Copied", `${obj.bank} details copied to clipboard`);
+  };
+
+  const copyDetailsToClipboard = async (bank, value, label) => {
+    await Clipboard.setStringAsync(`${bank}\n\n${label}: ${value}`);
+    Alert.alert("Copied", `${bank} - ${label} copied to clipboard`);
   };
 
   const CopyIcon = ({ onPress }) => (
@@ -58,7 +65,11 @@ const CardInfoModal = ({ cardDetails, onBackPress }) => {
               </Text>
               <CopyIcon
                 onPress={() =>
-                  copyToClipboard(cardDetails.fullNumber, "Card number")
+                  copyDetailsToClipboard(
+                    cardDetails.bank,
+                    cardDetails.fullNumber,
+                    "Card Number",
+                  )
                 }
               />
             </View>
@@ -70,7 +81,13 @@ const CardInfoModal = ({ cardDetails, onBackPress }) => {
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={commonStyles.detailValue}>{cardDetails.cvv}</Text>
               <CopyIcon
-                onPress={() => copyToClipboard(cardDetails.cvv, "CVV")}
+                onPress={() =>
+                  copyDetailsToClipboard(
+                    cardDetails.bank,
+                    cardDetails.cvv,
+                    "CVV",
+                  )
+                }
               />
             </View>
           </View>
@@ -84,7 +101,11 @@ const CardInfoModal = ({ cardDetails, onBackPress }) => {
               </Text>
               <CopyIcon
                 onPress={() =>
-                  copyToClipboard(cardDetails.expiryDate, "Expiry date")
+                  copyDetailsToClipboard(
+                    cardDetails.bank,
+                    cardDetails.expiryDate,
+                    "Expiry Date",
+                  )
                 }
               />
             </View>
@@ -116,6 +137,15 @@ const CardInfoModal = ({ cardDetails, onBackPress }) => {
           <View style={commonStyles.detailRow}>
             <Text style={commonStyles.detailLabel}>Credit Limit:</Text>
             <Text style={commonStyles.detailValue}>{cardDetails.limit}</Text>
+          </View>
+
+          <View style={commonStyles.buttonContainer}>
+            <TouchableOpacity
+              style={commonStyles.saveBtn}
+              onPress={() => copyToClipboard(cardDetails)}
+            >
+              <Text style={commonStyles.saveBtnText}>Copy Card Details</Text>
+            </TouchableOpacity>
           </View>
         </View>
 

@@ -39,7 +39,11 @@ const TransactionsListView = ({
           t.usedBy.toLowerCase() === filterUsedBy.toLowerCase();
         return cardMatch && monthMatch && usedByMatch;
       })
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      .sort((a, b) => {
+        const monthCompare = parseInt(b.month) - parseInt(a.month);
+        if (monthCompare !== 0) return monthCompare;
+        return parseInt(b.date) - parseInt(a.date);
+      });
   }, [transactions, filterCardId, filterMonth, filterUsedBy]);
 
   const getCardName = (cardId) => {
@@ -121,7 +125,13 @@ const TransactionsListView = ({
     const monthName = months[parseInt(item.month) - 1] || item.month;
 
     return (
-      <View style={commonStyles.transactionCard}>
+      <View
+        style={
+          item.creditCardBillPaid
+            ? commonStyles.transactionCardPaid
+            : commonStyles.transactionCard
+        }
+      >
         <View style={commonStyles.transactionHeader}>
           <View style={commonStyles.cardInfo}>
             {item.cardId ? (

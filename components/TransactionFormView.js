@@ -36,6 +36,9 @@ const TransactionFormView = ({
     transaction?.description || "",
   );
   const [status, setStatus] = useState(transaction?.status || "notPaid");
+  const [creditCardBillPaid, setCreditCardBillPaid] = useState(
+    transaction?.creditCardBillPaid || false,
+  );
 
   const [cardDropdownOpen, setCardDropdownOpen] = useState(false);
   const [dateDropdownOpen, setDateDropdownOpen] = useState(false);
@@ -54,6 +57,7 @@ const TransactionFormView = ({
       setUsedBy("");
       setDescription("");
       setStatus("notPaid");
+      setCreditCardBillPaid(false);
       setErrors({});
     }
   }, [transaction, defaultCards]);
@@ -89,6 +93,7 @@ const TransactionFormView = ({
         usedBy,
         description,
         status,
+        creditCardBillPaid,
       });
     }
   };
@@ -333,6 +338,34 @@ const TransactionFormView = ({
               onSelect={setStatus}
               onClose={() => setStatusDropdownOpen(false)}
             />
+
+            <View style={commonStyles.fieldContainer}>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center" }}
+                onPress={() => setCreditCardBillPaid(!creditCardBillPaid)}
+              >
+                <View
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderWidth: 2,
+                    borderColor: "#2196F3",
+                    borderRadius: 4,
+                    marginRight: 10,
+                    backgroundColor: creditCardBillPaid ? "#2196F3" : "#fff",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {creditCardBillPaid && (
+                    <Text style={{ color: "#fff", fontWeight: "bold" }}>✓</Text>
+                  )}
+                </View>
+                <Text style={{ fontSize: 16, color: "#333" }}>
+                  Credit Card Bill Paid
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={commonStyles.buttonContainer}>
               <TouchableOpacity
