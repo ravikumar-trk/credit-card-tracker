@@ -52,6 +52,13 @@ export default function App() {
   const [addingTransaction, setAddingTransaction] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
 
+  // Transactions filters state (lifted from TransactionsListView)
+  const [filterCardId, setFilterCardId] = useState("");
+  const [filterMonth, setFilterMonth] = useState(
+    (new Date().getMonth() + 1).toString(),
+  );
+  const [filterUsedBy, setFilterUsedBy] = useState("");
+
   useEffect(() => {
     initializeData();
   }, []);
@@ -231,6 +238,12 @@ export default function App() {
         <TransactionsListView
           defaultCards={cards}
           transactions={transactions}
+          filterCardId={filterCardId}
+          setFilterCardId={setFilterCardId}
+          filterMonth={filterMonth}
+          setFilterMonth={setFilterMonth}
+          filterUsedBy={filterUsedBy}
+          setFilterUsedBy={setFilterUsedBy}
           onAddTransaction={() => {
             setEditingTransaction(null);
             setAddingTransaction(true);

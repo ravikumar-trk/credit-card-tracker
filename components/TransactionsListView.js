@@ -17,14 +17,17 @@ const getCurrentMonth = () => (new Date().getMonth() + 1).toString();
 const TransactionsListView = ({
   defaultCards,
   transactions,
+  filterCardId,
+  setFilterCardId,
+  filterMonth,
+  setFilterMonth,
+  filterUsedBy,
+  setFilterUsedBy,
   onAddTransaction,
   onEditTransaction,
   onDeleteTransaction,
   onHomePress,
 }) => {
-  const [filterCardId, setFilterCardId] = useState("");
-  const [filterMonth, setFilterMonth] = useState(getCurrentMonth());
-  const [filterUsedBy, setFilterUsedBy] = useState("");
   const [cardDropdownOpen, setCardDropdownOpen] = useState(false);
   const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
   const [usedByDropdownOpen, setUsedByDropdownOpen] = useState(false);
